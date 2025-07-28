@@ -14,6 +14,7 @@ TEXTS = [
     above sea level. The butte is located just
     north of US 30 and the Union Pacific Railroad,
     which traverse the valley.''',
+    
     '''At the base of Fossil Butte are the bright
     red, purple, yellow and gray beds of the Wasatch
     Formation. Eroded portions of these horizontal
@@ -22,6 +23,7 @@ TEXTS = [
     to the top of the butte are the much steeper
     buff-to-white beds of the Green River Formation,
     which are about 300 feet thick.''',
+    
     '''The monument contains 8198 acres and protects
     a portion of the largest deposit of freshwater fish
     fossils in the world. The richest fossil fish deposits
@@ -34,86 +36,81 @@ TEXTS = [
 ]
 
 # pomocné proměnné
-cara = "-" * 35
+separator = "-" * 35
 # registrovaní uživatelé
 users = {"bob": "123", "ann": "pass123", "mike": "password123", "liz": "pass123"}
 
 # přihlášení
 username = input("username: ").lower()
 password = input("password: ").lower()
-print(cara)
+print(separator)
 if username in users and password == users.get(username):
-    print("Vítej v aplikaci, " + username + "\nMáš 3 texty na analízu. ")
+    print("Welcome to the app, " + username + f"\nWe have {len(TEXTS)} texts to be analyzed. ") # podle zadání print("Welcome to the app, " + username + "\nWe have 3 texts to be analyzed. ")
 else:
-    print("Neregistrovaný uživatel, ukončuji program.")
+    print("unregistered user, terminating the program..")
     quit()
-print(cara)
+print(separator)
+
+# výpis textů
+print("Available texts:")
+for i, text in enumerate(TEXTS):
+    print(f"{i + 1}: {text[:30]}...")  
+print(separator)
 
 # zadaní čísla textu
-zadani_textu = (input("Zadej číslo textu 1 až 3: "))
-print(cara)
+index_text = (input("Enter the number of the text to analyze: ")) # podle zadání print("Enter a number btw. 1 and 3 to select: ")
+print(separator)
 
 # kontrola zadaného čísla textu
-if not zadani_textu.isdigit():
-    print("Nezadal jste číslo, ukončuji program.")
+if not index_text.isdigit():
+    print("This isn't a number, terminating the program..")
     quit()
-zadani_textu = int(zadani_textu)
+
+index_text = int(index_text)
 # kontrola rozsahu zadaného čísla textu
-if 1<= zadani_textu <=3:
-    text_číslo = TEXTS[zadani_textu - 1]
+if 1 <= index_text <= len(TEXTS):
+    select_text = TEXTS[index_text - 1]
 else:
-    print("Text neexistuje")
+    print("Text number is out of range, terminating the program..")
     quit()
 
-# počet slov
-slova = text_číslo.split()
-pocet_slov = len(slova)
+# analýza textu
+word_count = 0
+titlecase = 0
+uppercase = 0
+lowercase = 0
+numeric = 0
+sum_numbers = 0
+length_words = {}
+for word in select_text.split():
+    cleaned = word.strip(",.!:'") # odstranění interpunkce a bílých znaků
+    if cleaned:
+        word_count += 1 # záznam počtu slov
 
-# počet slov s velkým písmenem
-s_velkym_pismenem = 0
-for velke_pismeno in slova:
-    if velke_pismeno[0].isupper():
-        if not velke_pismeno[1].isupper():
-            s_velkym_pismenem += 1
+        length = len(cleaned) # zjištění délky slova
+        length_words[length] = length_words.get(length, 0) + 1 # záznam délky slova a jeho výskytu
 
-# počet slov psané velkými písmeny a malými písmeny
-velkymi_pismeny = 0
-mala_slova = 0
-for slovo in slova:
-    if slovo.isupper():
-        velkymi_pismeny += 1
-    elif slovo.islower():
-        mala_slova += 1
+        if cleaned.istitle(): # započítání slov s velkým počátečním písmenem
+            titlecase += 1
+        elif cleaned.isupper(): # započítání slov psaných velkými písmeny
+            uppercase += 1
+        elif cleaned.islower(): # započítání slov psaných malými písmeny
+            lowercase += 1
+        elif cleaned.isdigit(): # započítání čísel a jejich součet
+            numeric += 1
+            sum_numbers += int(cleaned)
 
-# počet čísel
-pocet_cisel = 0
-suma = 0
-for slovo in slova:
-    if slovo.isnumeric():
-        pocet_cisel += 1
-        suma += int(slovo)
-
-# statistika slov
-delky_slov = {}
-for slovo in slova:
-    ciste_slovo = slovo.strip(",.!:'")
-    delka = len(ciste_slovo)
-    if delka in delky_slov:
-        delky_slov[delka] += 1
-    else:
-        delky_slov[delka] = 1
 
 # výstup programu
-print(f"Ve vybraném textu je {pocet_slov} počet slov.")
-print(f"Velkým písmenem začíná {s_velkym_pismenem} slov.")
-print(f"Počet slov psaných velkými písmeny {velkymi_pismeny}.")
-print(f"Počet slov psaných malími písmeny {mala_slova}.")
-print(f"Počet čísel {pocet_cisel}.")
-print(f"Suma čísel {suma}.")
-print(cara)
-print("Délka | Výskyt | Počet")
-print(cara)
-for delka in sorted(delky_slov):
-    pocet = delky_slov[delka]
-    hvezdy = "*" * pocet
-    print(f"{delka:3} | {hvezdy: <17} | {pocet}")
+print(f"There are {word_count} words in the selected text.")
+print(f"There are {titlecase} titlecase words.")
+print(f"There are {uppercase} uppercase words.")
+print(f"There are {lowercase} lowercase words.")
+print(f"There are {numeric} numeric strings.")
+print(f"The sum of all the numbers {sum_numbers}.")
+print(separator)
+print("LEN |    OCCURRENCES    | NR.")
+print(separator)
+for length in sorted(length_words):
+    stars = "*" * min(length_words[length], 20) # omezení počtu hvězdiček na 20
+    print(f"{length: <3} | {stars: <20} | {length_words[length]}")
